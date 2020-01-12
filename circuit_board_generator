@@ -3,6 +3,8 @@
 # Generate random patterns that look like printed-circuit
 # board traces. Based on the JavaScript code found at
 # <https://codepen.io/tsuhre/details/xgmEPe>.
+#
+# External program needed: ImageMagick for on-screen display.
 #-
 
 import sys
