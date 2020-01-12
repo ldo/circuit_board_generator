@@ -67,7 +67,9 @@ directions = tuple \
             (1, 0),
             (1, 1), (0, 1), (-1, 1),
             (-1, 0),
-        ] # following order in original code, but probably not important
+        ]
+          # following order in original code, main important thing
+          # is that index±4 is in opposite direction.
   )
 
 class Cell :
