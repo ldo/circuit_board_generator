@@ -215,6 +215,7 @@ pix = qah.ImageSurface.create \
 ctx = \
     (qah.Context.create(pix)
         .scale(dpi / qah.base_dpi)
+        .translate(Vector(1, 1) * cell_size / 2)
     )
 ctx.source_colour = colours["background"]
 ctx.paint()
