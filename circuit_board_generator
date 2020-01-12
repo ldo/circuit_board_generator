@@ -301,7 +301,7 @@ for wire in wires :
 pix.flush()
 if outfilename != None :
     if os.path.isfile(outfilename) :
-        raise RuntimError("already exists: %s" % repr(outfilename))
+        raise RuntimeError("already exists: %s" % repr(outfilename))
     #end if
     pix.write_to_png(outfilename)
 else :
