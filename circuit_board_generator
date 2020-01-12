@@ -145,7 +145,7 @@ class Wire :
             ctx.source_colour = colours["trace"]
             ctx.circle(cell.pos * cell_size, cell_size * 0.35)
             ctx.fill()
-            ctx.circle(cell.pos * cell_size, cell_size * 0.2)
+            ctx.circle(cell.pos * cell_size, cell_size * 0.21)
             ctx.source_colour = colours["pad"]
             ctx.fill()
         #end for
