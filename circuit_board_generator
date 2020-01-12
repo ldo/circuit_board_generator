@@ -220,7 +220,11 @@ for keyword, value in opts :
     elif keyword == "--min-wire" :
         min_wire_length = pos_int(value)
     elif keyword == "--pattern" :
-        pattern_size = Vector(1, 1) * pos_int(value)
+        if ":" in value :
+            pattern_size = Vector(*tuple(pos_int(v) for v in value.split(":", 1)))
+        else :
+            pattern_size = Vector(1, 1) * pos_int(value)
+        #end if
     elif keyword == "--seed" :
         ranseed = int(value)
     elif keyword == "--straight" :
