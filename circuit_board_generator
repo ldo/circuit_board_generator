@@ -203,11 +203,7 @@ while len(positions_avail) != 0 :
     sys.stderr.write("generated wire: %s\n" % repr(list(x.pos for x in wire.cells))) # debug
     wires.append(wire)
     for cell in wire.cells :
-        try :
-            positions_avail.remove(cell.pos)
-        except ValueError :
-            sys.stderr.write("dupl pos %s??\n" % repr(cell.pos)) # debug
-        #end try
+        positions_avail.remove(cell.pos)
     #end for
 #end while
 
