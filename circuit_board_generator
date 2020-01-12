@@ -23,7 +23,7 @@ from qahirah import \
 # Useful stuff
 #-
 
-def pos_int(s) :
+def pos_int(s : str) :
     i = int(s)
     if i <= 0 :
         raise ValueError("must be positive integer: %s" % repr(s))
@@ -32,7 +32,7 @@ def pos_int(s) :
         i
 #end pos_int
 
-def vector_str(s, conv) :
+def vector_str(s : str, conv) :
     if ":" in s :
         result = Vector(*tuple(conv(v) for v in s.split(":", 1)))
     else :
@@ -76,7 +76,7 @@ directions = tuple \
 
 class Cell :
 
-    def __init__(self, pos) :
+    def __init__(self, pos : Vector) :
         self.pos = pos
         self.available = True
     #end __init__
@@ -94,7 +94,7 @@ class Grid :
           )
     #end __init__
 
-    def __getitem__(self, index) :
+    def __getitem__(self, index : Vector) :
         index = Vector.from_tuple(index)
         assert valid_grid_pos(index)
         j, i = index
@@ -104,7 +104,7 @@ class Grid :
 
 #end Grid
 
-def valid_grid_pos(pos) :
+def valid_grid_pos(pos : Vector) :
     "is pos the coordinates of a valid position within the grid."
     return \
         (
@@ -116,7 +116,7 @@ def valid_grid_pos(pos) :
         )
 #end valid_grid_pos
 
-def find_open_direction(pos) :
+def find_open_direction(pos : Vector) :
     "finds a random free direction that the wire can start from."
     check_directions = list(range(8))
     random.shuffle(check_directions)
@@ -136,7 +136,7 @@ def find_open_direction(pos) :
         result
 #end find_open_direction
 
-def no_crossover(dirindex, pos) :
+def no_crossover(dirindex, pos : Vector) :
     "checks that a wire extending into pos will not come too close to another wire."
     if dirindex % 2 == 0 :
         # diagonal step
@@ -151,7 +151,7 @@ def no_crossover(dirindex, pos) :
 
 class Wire :
 
-    def __init__(self, start) :
+    def __init__(self, start : Cell) :
         self.cells = [start]
         start.available = False
         self.last_direction = find_open_direction(start.pos)
@@ -163,7 +163,7 @@ class Wire :
             len(self.cells)
     #end __len__
 
-    def render(self, ctx) :
+    def render(self, ctx : qah.Context) :
         "draws the Wire into a graphics context."
         ctx.save()
         ctx.source_colour = colours["trace"]
