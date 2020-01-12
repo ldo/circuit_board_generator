@@ -46,7 +46,7 @@ def vector_str(s, conv) :
 
 cell_size = 30
 pattern_size = Vector(20, 20) # in units of cells
-margin = Vector(10, 10)
+margin = Vector(0, 0)
 wire_length = 20
 min_wire_length = 2
 straightness = 5
