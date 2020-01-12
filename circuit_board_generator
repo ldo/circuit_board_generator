@@ -197,7 +197,7 @@ positions_avail = list \
 while len(positions_avail) != 0 :
     # sys.stderr.write("positions_avail left = %s\n" % repr(positions_avail)) # debug
     pos = random.choice(positions_avail)
-    cell = Cell(pos)
+    cell = grid[pos]
     wire = Wire(cell)
     wire.generate()
     sys.stderr.write("generated wire: %s\n" % repr(list(x.pos for x in wire.cells))) # debug
