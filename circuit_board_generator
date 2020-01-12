@@ -47,11 +47,15 @@ def vector_str(s : str, conv) :
 #-
 
 cell_size = 30
+  # governs scale of rendering of pattern
 pattern_size = Vector(20, 20) # in units of cells
 margin = Vector(0, 0)
 wire_length = 20
+  # try to generate each wire up to this length
 min_wire_length = 2
+  # don’t show wires shorter than this
 straightness = 5
+  # bias for maintaining wire direction
 dpi = qah.base_dpi
 colours = \
     {
