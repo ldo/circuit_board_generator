@@ -30,12 +30,23 @@ def pos_int(s) :
         i
 #end pos_int
 
+def vector_str(s, conv) :
+    if ":" in s :
+        result = Vector(*tuple(conv(v) for v in s.split(":", 1)))
+    else :
+        result = Vector(1, 1) * conv(s)
+    #end if
+    return \
+        result
+#end vector_str
+
 #+
 # Generating the circuit board
 #-
 
 cell_size = 30
 pattern_size = Vector(20, 20) # in units of cells
+margin = Vector(10, 10)
 wire_length = 20
 min_wire_length = 2
 straightness = 5
@@ -212,19 +223,17 @@ opts, args = getopt.getopt \
   (
     sys.argv[1:],
     "",
-    ["cell=", "min-wire=", "pattern=", "seed=", "straight=", "wire="]
+    ["cell=", "margin=", "min-wire=", "pattern=", "seed=", "straight=", "wire="]
   )
 for keyword, value in opts :
     if keyword == "--cell" :
         cell_size = pos_int(value)
     elif keyword == "--min-wire" :
         min_wire_length = pos_int(value)
+    elif keyword == "--margin" :
+        margin = vector_str(value, float)
     elif keyword == "--pattern" :
-        if ":" in value :
-            pattern_size = Vector(*tuple(pos_int(v) for v in value.split(":", 1)))
-        else :
-            pattern_size = Vector(1, 1) * pos_int(value)
-        #end if
+        pattern_size = vector_str(value, pos_int)
     elif keyword == "--seed" :
         ranseed = int(value)
     elif keyword == "--straight" :
@@ -267,12 +276,13 @@ while len(positions_avail) != 0 :
 pix = qah.ImageSurface.create \
   (
     format = CAIRO.FORMAT_RGB24,
-    dimensions = round(pattern_size * cell_size * dpi / qah.base_dpi)
+    dimensions = round((pattern_size * cell_size + 2 * margin) * dpi / qah.base_dpi)
   )
 ctx = \
     (qah.Context.create(pix)
         .scale(dpi / qah.base_dpi)
         .translate(Vector(1, 1) * cell_size / 2)
+        .translate(margin)
     )
 ctx.source_colour = colours["background"]
 ctx.paint()
