@@ -133,6 +133,7 @@ def find_open_direction(pos) :
 #end find_open_direction
 
 def no_crossover(dirindex, pos) :
+    "checks that a wire extending into pos will not come too close to another wire."
     if dirindex % 2 == 0 :
         # diagonal step
         adj = directions[dirindex]
@@ -182,13 +183,16 @@ class Wire :
     #end render
 
     def generate(self) :
+        "actually generates the rest of the wire."
         while True :
+            # try extending the wire by another cell, if I can
             if len(self.cells) == wire_length :
                 break
             prev_cell = self.cells[-1]
             tries = random.choice(([0, 1, -1], [0, -1, 1]))
             has_space = False
             while True :
+                # try another direction from tries, if there are any left
                 if len(tries) == 0 :
                     break
                 mod = tries.pop(math.floor(random.random() ** straightness * len(tries)))
