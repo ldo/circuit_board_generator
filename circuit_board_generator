@@ -73,7 +73,7 @@ class Grid :
     def __init__(self) :
         self.cells = list \
           (
-            Cell(Vector(i, j))
+            Cell(Vector(j, i))
             for i in range(pattern_size.y)
             for j in range(pattern_size.x)
           )
@@ -82,7 +82,7 @@ class Grid :
     def __getitem__(self, index) :
         index = Vector.from_tuple(index)
         assert valid_grid_pos(index)
-        i, j = index
+        j, i = index
         return \
             self.cells[i * pattern_size.x + j]
     #end __getitem__
@@ -245,7 +245,7 @@ grid = Grid()
 wires = []
 positions_avail = list \
   (
-    grid[i, j].pos
+    grid[j, i].pos
     for j in range(pattern_size.x)
     for i in range(pattern_size.y)
   )
