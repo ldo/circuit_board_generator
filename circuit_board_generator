@@ -8,11 +8,29 @@
 import sys
 import math
 import random
+import getopt
 import qahirah as qah
 from qahirah import \
     CAIRO, \
     Colour, \
     Vector
+
+#+
+# Useful stuff
+#-
+
+def pos_int(s) :
+    i = int(s)
+    if i <= 0 :
+        raise ValueError("must be positive integer: %s" % repr(s))
+    #end if
+    return \
+        i
+#end pos_int
+
+#+
+# Generating the circuit board
+#-
 
 cell_size = 30
 pattern_size = Vector(20, 20) # in units of cells
@@ -68,8 +86,6 @@ class Grid :
     #end __getitem__
 
 #end Grid
-
-grid = Grid()
 
 def valid_grid_pos(pos) :
     "is pos the coordinates of a valid position within the grid."
@@ -184,9 +200,41 @@ class Wire :
 
 #end Wire
 
-random.seed(10)
-  # repeatable patterns for testing, for now
+#+
+# Mainline
+#-
 
+ranseed = None
+opts, args = getopt.getopt \
+  (
+    sys.argv[1:],
+    "",
+    ["cell=", "min-wire=", "pattern=", "seed=", "straight=", "wire="]
+  )
+for keyword, value in opts :
+    if keyword == "--cell" :
+        cell_size = pos_int(value)
+    elif keyword == "--min-wire" :
+        min_wire_length = pos_int(value)
+    elif keyword == "--pattern" :
+        pattern_size = Vector(1, 1) * pos_int(value)
+    elif keyword == "--seed" :
+        ranseed = int(value)
+    elif keyword == "--straight" :
+        straightness = pos_int(value)
+    elif keyword == "--wire" :
+        wire_length = pos_int(value)
+    #end if
+#end for
+if len(args) != 0 :
+    raise getopt.GetoptError("no args expected")
+#end if
+
+if ranseed != None :
+    random.seed(ranseed)
+#end if
+
+grid = Grid()
 wires = []
 positions_avail = list \
   (
