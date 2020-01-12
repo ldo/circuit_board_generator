@@ -141,12 +141,14 @@ class Wire :
         ctx.stroke()
         ctx.line_width = cell_size / 6
         for cell in (self.cells[0], self.cells[-1]) :
-            ctx.new_sub_path()
-            ctx.circle((cell.pos + Vector(0.5, 0.5)) * cell_size, cell_size * 0.7)
+            ctx.new_path()
+            ctx.source_colour = colours["trace"]
+            ctx.circle(cell.pos * cell_size, cell_size * 0.35)
+            ctx.fill()
+            ctx.circle(cell.pos * cell_size, cell_size * 0.2)
+            ctx.source_colour = colours["pad"]
+            ctx.fill()
         #end for
-        ctx.stroke_preserve()
-        ctx.source_colour = colours["pad"]
-        ctx.fill()
         ctx.restore()
     #end render
 
