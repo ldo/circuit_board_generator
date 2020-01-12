@@ -24,7 +24,7 @@ colours = \
     {
         "background" : Colour.from_hsva((1 / 3, 0.7, 0.3)),
         "pad" : Colour.grey(0),
-        "trace" : Colour.from_hsva((0.25, 0.6, 0.6)),
+        "trace" : Colour.from_hsva((1 / 6, 0.6, 0.6)),
     }
 
 directions = tuple \
