@@ -68,8 +68,8 @@ directions = tuple \
             (1, 1), (0, 1), (-1, 1),
             (-1, 0),
         ]
-          # following order in original code, main important thing
-          # is that index±4 is in opposite direction.
+          # all the different one-step directions from the
+          # current cell, arranged in a circle.
   )
 
 class Cell :
