@@ -195,12 +195,10 @@ positions_avail = list \
     for i in range(pattern_size.y)
   )
 while len(positions_avail) != 0 :
-    # sys.stderr.write("positions_avail left = %s\n" % repr(positions_avail)) # debug
     pos = random.choice(positions_avail)
     cell = grid[pos]
     wire = Wire(cell)
     wire.generate()
-    sys.stderr.write("generated wire: %s\n" % repr(list(x.pos for x in wire.cells))) # debug
     wires.append(wire)
     for cell in wire.cells :
         positions_avail.remove(cell.pos)
