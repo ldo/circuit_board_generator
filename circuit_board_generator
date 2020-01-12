@@ -6,8 +6,10 @@
 #-
 
 import sys
+import os
 import math
 import random
+import subprocess
 import getopt
 import qahirah as qah
 from qahirah import \
@@ -205,6 +207,7 @@ class Wire :
 #-
 
 ranseed = None
+outfilename = None
 opts, args = getopt.getopt \
   (
     sys.argv[1:],
@@ -227,7 +230,11 @@ for keyword, value in opts :
     #end if
 #end for
 if len(args) != 0 :
-    raise getopt.GetoptError("no args expected")
+    if len(args) == 1 :
+        outfilename = args[0]
+    else :
+        raise getopt.GetoptError("no more than 1 arg (outfilename) expected")
+    #end if
 #end if
 
 if ranseed != None :
@@ -271,4 +278,19 @@ for wire in wires :
     #end if
 #end for
 
-pix.flush().write_to_png("test.png")
+pix.flush()
+if outfilename != None :
+    if os.path.isfile(outfilename) :
+        raise RuntimError("already exists: %s" % repr(outfilename))
+    #end if
+    pix.write_to_png(outfilename)
+else :
+    proc_display = subprocess.Popen \
+      (
+        args = ("display", "/dev/stdin"),
+        stdin = subprocess.PIPE
+      )
+    pix.write_to_png_file(proc_display.stdin)
+    proc_display.stdin.close()
+    proc_display.wait()
+#end if
