@@ -198,7 +198,7 @@ class Wire :
                 if len(tries) == 0 :
                     break
                 mod = tries.pop(math.floor(random.random() ** straightness * len(tries)))
-                index = (self.last_direction + 4 + mod) % 8
+                index = (self.last_direction + mod) % 8
                 direction = directions[index]
                 pos = prev_cell.pos + direction
                 if valid_grid_pos(pos) :
@@ -207,7 +207,7 @@ class Wire :
                         self.cells.append(cell)
                         cell.available = False
                         has_space = True
-                        self.last_direction = (self.last_direction + mod) % 8
+                        self.last_direction = index
                         break
                     #end if
                 #end if
