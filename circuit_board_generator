@@ -107,7 +107,7 @@ def no_crossover(dirindex, pos) :
     if dirindex % 2 == 0 :
         # diagonal step
         adj = directions[dirindex]
-        result = grid[pos.x - adj.x, pos.x].available or grid[pos.x, pos.y - adj.y].available
+        result = grid[pos.x - adj.x, pos.y].available or grid[pos.x, pos.y - adj.y].available
     else :
         result = True
     #end if
