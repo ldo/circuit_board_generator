@@ -143,8 +143,7 @@ def find_open_direction(pos : Vector) :
 #end find_open_direction
 
 def no_crossover(dirindex, pos : Vector) :
-    "checks that a wire extending diagonally into pos" \
-    " will not come too close to another wire."
+    "stops diagonal wires from crossing."
     if dirindex % 2 == 0 :
         # diagonal step
         adj = directions[dirindex]
