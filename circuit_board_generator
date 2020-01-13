@@ -83,6 +83,7 @@ class Cell :
     def __init__(self, pos : Vector) :
         self.pos = pos
         self.available = True
+        self.owner = None # owning Wire
     #end __init__
 
 #end Cell
@@ -147,7 +148,9 @@ def no_crossover(dirindex, pos : Vector) :
     if dirindex % 2 == 0 :
         # diagonal step
         adj = directions[dirindex]
-        result = grid[pos.x - adj.x, pos.y].available or grid[pos.x, pos.y - adj.y].available
+        diag1 = grid[pos.x - adj.x, pos.y]
+        diag2 = grid[pos.x, pos.y - adj.y]
+        result = diag1.available or diag2.available or diag1.owner != diag2.owner
     else :
         result = True
     #end if
@@ -158,6 +161,7 @@ def no_crossover(dirindex, pos : Vector) :
 class Wire :
 
     def __init__(self, start : Cell) :
+        start.owner = self
         self.cells = [start]
         start.available = False
         self.last_direction = find_open_direction(start.pos)
@@ -212,6 +216,7 @@ class Wire :
                 if valid_grid_pos(pos) :
                     cell = grid[pos]
                     if cell.available and no_crossover(index, pos) :
+                        cell.owner = self
                         self.cells.append(cell)
                         cell.available = False
                         has_space = True
