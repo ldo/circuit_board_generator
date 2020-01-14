@@ -243,6 +243,8 @@ class Wire :
                 break
             prev_cell = self.cells[-1]
             tries = random.choice(([0, 1, -1], [0, -1, 1]))
+              # either continue on straight (according to straightness bias),
+              # or turn ±45° (with equal probability)
             has_space = False
             while True :
                 # try another direction from tries, if there are any left
