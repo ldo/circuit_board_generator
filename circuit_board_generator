@@ -2,7 +2,39 @@
 #+
 # Generate random patterns that look like printed-circuit
 # board traces. Based on the JavaScript code found at
-# <https://codepen.io/tsuhre/details/xgmEPe>.
+# <https://codepen.io/tsuhre/details/xgmEPe>. Invoke this
+# script as follows:
+#
+#     circuit_board_generator «options» [«outfile»]
+#
+# where «outfile» is the name of the PNG file under which
+# to save the output. If this is not specified, then the
+# image is displayed on-screen. Valid «options» are:
+#
+#     --cell=«cell_size»
+#         the dimensions of each cell of the pattern, in integer
+#         points. If omitted, defaults to 30.
+#     --margin=«x»[:«y»]
+#         the dimensions of the margin to leave around the pattern.
+#         If omitted, defaults to 0:0.
+#     --min-wire=«n»
+#         the minimum length in cell steps of wires that make up the
+#         pattern. If omitted, defaults to 2.
+#     --pattern=«x»[:«y»]
+#         the dimensions, in cell units of the pattern to generate.
+#         If omitted, defaults to 20:20.
+#     --seed=«starting-seed»
+#         the starting integer value for the pseudorandom number
+#         generator. Specifying the same seed with the same parameters
+#         will produce the same pattern. If omitted, a random seed is
+#         chosen, to produce a different pattern each time.
+#     --straight=«bias»
+#         a positive integer bias that controls how straight the
+#         generated wires tend to be. If omitted, the default is 5.
+#     --wire=«max-length»
+#         the maximum length of generated wires. Their actual lengths
+#         may be less, depending on the space available around
+#         previously-generated wires. If omitted, the default is 20.
 #
 # External library needed: Qahirah <https://gitlab.com/ldo/qahirah>,
 # <https://github.com/ldo/qahirah>.
