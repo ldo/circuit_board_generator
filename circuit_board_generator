@@ -31,6 +31,9 @@
 #     --straight=«bias»
 #         a positive integer bias that controls how straight the
 #         generated wires tend to be. If omitted, the default is 5.
+#     --tile
+#         specifies that wires can cross the edges of the pattern
+#         so they join up when the pattern is used to tile a plane.
 #     --wire=«max-length»
 #         the maximum length of generated wires. Their actual lengths
 #         may be less, depending on the space available around
@@ -95,6 +98,7 @@ min_wire_length = 2
   # don’t show wires shorter than this
 straightness = 5
   # bias for maintaining wire direction
+tiling = False
 dpi = qah.base_dpi
 colours = \
     {
@@ -140,7 +144,11 @@ class Grid :
 
     def __getitem__(self, index : Vector) :
         index = Vector.from_tuple(index)
-        assert valid_grid_pos(index)
+        if tiling :
+            index %= pattern_size
+        else :
+            assert valid_grid_pos(index)
+        #end if
         j, i = index
         return \
             self.cells[i * pattern_size.x + j]
@@ -154,9 +162,13 @@ def valid_grid_pos(pos : Vector) :
         (
             pos.isint()
         and
-            pos.x >= 0 and pos.x < pattern_size.x
-        and
-            pos.y >= 0 and pos.y < pattern_size.y
+            (
+                tiling
+            or
+                    pos.x >= 0 and pos.x < pattern_size.x
+                and
+                    pos.y >= 0 and pos.y < pattern_size.y
+            )
         )
 #end valid_grid_pos
 
@@ -215,22 +227,43 @@ class Wire :
     def render(self, ctx : qah.Context) :
         "draws the Wire into a graphics context."
         ctx.save()
-        ctx.source_colour = colours["trace"]
-        ctx.line_width = cell_size / 4
-        ctx.new_path()
-        for cell in self.cells :
-            ctx.line_to(cell.pos * cell_size)
-        #end for
-        ctx.stroke()
-        ctx.line_width = cell_size / 6
-        for cell in (self.cells[0], self.cells[-1]) :
-            ctx.new_path()
-            ctx.source_colour = colours["trace"]
-            ctx.circle(cell.pos * cell_size, cell_size * 0.35)
-            ctx.fill()
-            ctx.circle(cell.pos * cell_size, cell_size * 0.21)
-            ctx.source_colour = colours["pad"]
-            ctx.fill()
+        # For a tiled pattern, work out how many repeats of
+        # this wire render are necessary, suitably offset
+        # by whole multiples of the pattern dimensions, to
+        # ensure all parts appear in the tile.
+        min_pos = Vector \
+          (
+            min(cell.pos.x for cell in self.cells),
+            min(cell.pos.y for cell in self.cells)
+          )
+        max_pos = Vector \
+          (
+            max(cell.pos.x for cell in self.cells),
+            max(cell.pos.y for cell in self.cells)
+          )
+        min_step = math.floor(min_pos / pattern_size)
+        max_step = math.floor(max_pos / pattern_size)
+        for y_step in range(min_step.y, max_step.y + 1) :
+            for x_step in range(min_step.x, max_step.x + 1) :
+                offset = - Vector(x_step, y_step) * pattern_size
+                ctx.line_width = cell_size / 4
+                ctx.source_colour = colours["trace"]
+                ctx.new_path()
+                for cell in self.cells :
+                    ctx.line_to((cell.pos + offset) * cell_size)
+                #end for
+                ctx.stroke()
+                ctx.line_width = cell_size / 6
+                for cell in (self.cells[0], self.cells[-1]) :
+                    ctx.new_path()
+                    ctx.source_colour = colours["trace"]
+                    ctx.circle((cell.pos + offset) * cell_size, cell_size * 0.35)
+                    ctx.fill()
+                    ctx.circle((cell.pos + offset) * cell_size, cell_size * 0.21)
+                    ctx.source_colour = colours["pad"]
+                    ctx.fill()
+                #end for
+            #end for
         #end for
         ctx.restore()
     #end render
@@ -257,6 +290,9 @@ class Wire :
                 if valid_grid_pos(pos) :
                     cell = grid[pos]
                     if cell.available and no_crossover(index, pos) :
+                        if tiling :
+                            cell.pos = pos
+                        #end if
                         cell.owner = self
                         self.cells.append(cell)
                         cell.available = False
@@ -283,7 +319,7 @@ opts, args = getopt.getopt \
   (
     sys.argv[1:],
     "",
-    ["cell=", "margin=", "min-wire=", "pattern=", "seed=", "straight=", "wire="]
+    ["cell=", "margin=", "min-wire=", "pattern=", "seed=", "straight=", "tile", "wire="]
   )
 for keyword, value in opts :
     if keyword == "--cell" :
@@ -298,6 +334,8 @@ for keyword, value in opts :
         ranseed = int(value)
     elif keyword == "--straight" :
         straightness = pos_int(value)
+    elif keyword == "--tile" :
+        tiling = True
     elif keyword == "--wire" :
         wire_length = pos_int(value)
     #end if
@@ -329,7 +367,7 @@ while len(positions_avail) != 0 :
     wire.generate()
     wires.append(wire)
     for cell in wire.cells :
-        positions_avail.remove(cell.pos)
+        positions_avail.remove(cell.pos % pattern_size)
     #end for
 #end while
 
