@@ -4,6 +4,9 @@
 # board traces. Based on the JavaScript code found at
 # <https://codepen.io/tsuhre/details/xgmEPe>.
 #
+# External library needed: Qahirah <https://gitlab.com/ldo/qahirah>,
+# <https://github.com/ldo/qahirah>.
+#
 # External program needed: ImageMagick for on-screen display.
 #-
 
@@ -24,6 +27,7 @@ from qahirah import \
 #-
 
 def pos_int(s : str) :
+    "parses s as an integer, which must be positive."
     i = int(s)
     if i <= 0 :
         raise ValueError("must be positive integer: %s" % repr(s))
@@ -33,6 +37,9 @@ def pos_int(s : str) :
 #end pos_int
 
 def vector_str(s : str, conv) :
+    "parses s as one or two values «x» or «x»:«y», using conv" \
+    " to parse «x» and «y». Returns the result as Vector(«x», «x»)" \
+    " or Vector(«x», «y») respectively."
     if ":" in s :
         result = Vector(*tuple(conv(v) for v in s.split(":", 1)))
     else :
