@@ -31,9 +31,11 @@
 #     --straight=«bias»
 #         a positive integer bias that controls how straight the
 #         generated wires tend to be. If omitted, the default is 5.
-#     --tile
+#     --tile|--tile-x|--tile-y
 #         specifies that wires can cross the edges of the pattern
 #         so they join up when the pattern is used to tile a plane.
+#         --tile-x allows crossing in the x-direction, --tile-y in
+#         the y-direction, and --tile in both directions.
 #     --wire=«max-length»
 #         the maximum length of generated wires. Their actual lengths
 #         may be less, depending on the space available around
@@ -98,7 +100,7 @@ min_wire_length = 2
   # don’t show wires shorter than this
 straightness = 5
   # bias for maintaining wire direction
-tiling = False
+tiling = Vector(False, False)
 dpi = qah.base_dpi
 colours = \
     {
@@ -131,6 +133,19 @@ class Cell :
 
 #end Cell
 
+def normalize(pos) :
+    "returns pos adjusted for wraparound along permitted axes."
+    pos = Vector(*tuple(pos)) # ensure I get a new Vector instance
+    if tiling.x :
+        pos.x %= pattern_size.x
+    #end if
+    if tiling.y :
+        pos.y %= pattern_size.y
+    #end if
+    return \
+        pos
+#end normalize
+
 class Grid :
 
     def __init__(self) :
@@ -143,12 +158,8 @@ class Grid :
     #end __init__
 
     def __getitem__(self, index : Vector) :
-        index = Vector.from_tuple(index)
-        if tiling :
-            index %= pattern_size
-        else :
-            assert valid_grid_pos(index)
-        #end if
+        index = normalize(index)
+        assert valid_grid_pos(index)
         j, i = index
         return \
             self.cells[i * pattern_size.x + j]
@@ -162,13 +173,9 @@ def valid_grid_pos(pos : Vector) :
         (
             pos.isint()
         and
-            (
-                tiling
-            or
-                    pos.x >= 0 and pos.x < pattern_size.x
-                and
-                    pos.y >= 0 and pos.y < pattern_size.y
-            )
+            (tiling.x or pos.x >= 0 and pos.x < pattern_size.x)
+        and
+            (tiling.y or pos.y >= 0 and pos.y < pattern_size.y)
         )
 #end valid_grid_pos
 
@@ -290,7 +297,7 @@ class Wire :
                 if valid_grid_pos(pos) :
                     cell = grid[pos]
                     if cell.available and no_crossover(index, pos) :
-                        if tiling :
+                        if tiling.x or tiling.y :
                             cell.pos = pos
                         #end if
                         cell.owner = self
@@ -319,7 +326,10 @@ opts, args = getopt.getopt \
   (
     sys.argv[1:],
     "",
-    ["cell=", "margin=", "min-wire=", "pattern=", "seed=", "straight=", "tile", "wire="]
+    [
+        "cell=", "margin=", "min-wire=", "pattern=", "seed=",
+        "straight=", "tile", "tile-x", "tile-y", "wire="
+    ]
   )
 for keyword, value in opts :
     if keyword == "--cell" :
@@ -335,7 +345,12 @@ for keyword, value in opts :
     elif keyword == "--straight" :
         straightness = pos_int(value)
     elif keyword == "--tile" :
-        tiling = True
+        tiling.x = True
+        tiling.y = True
+    elif keyword == "--tile-x" :
+        tiling.x = True
+    elif keyword == "--tile-y" :
+        tiling.y = True
     elif keyword == "--wire" :
         wire_length = pos_int(value)
     #end if
@@ -367,7 +382,7 @@ while len(positions_avail) != 0 :
     wire.generate()
     wires.append(wire)
     for cell in wire.cells :
-        positions_avail.remove(cell.pos % pattern_size)
+        positions_avail.remove(normalize(cell.pos))
     #end for
 #end while
 
