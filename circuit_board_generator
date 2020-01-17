@@ -17,6 +17,10 @@
 #     --margin=«x»[:«y»]
 #         the dimensions of the margin to leave around the pattern.
 #         If omitted, defaults to 0:0.
+#     --mask
+#         indicates that the image is to be used as an alpha mask,
+#         rather than as a picture in itself. Everything other than
+#         the wire traces becomes transparent.
 #     --min-wire=«n»
 #         the minimum length in cell steps of wires that make up the
 #         pattern. If omitted, defaults to 2.
@@ -102,11 +106,17 @@ straightness = 5
   # bias for maintaining wire direction
 tiling = Vector(False, False)
 dpi = qah.base_dpi
-colours = \
+colours_image = \
     {
         "background" : Colour.from_hsva((1 / 3, 0.7, 0.3)),
         "pad" : Colour.grey(0),
         "trace" : Colour.from_hsva((1 / 8, 0.6, 0.6)),
+    }
+colours_mask = \
+    {
+        "background" : Colour.grey(0, 0),
+        "pad" : Colour.grey(0, 0),
+        "trace" : Colour.grey(0, 1),
     }
 
 directions = tuple \
@@ -320,14 +330,16 @@ class Wire :
 # Mainline
 #-
 
+colours = colours_image
 ranseed = None
 outfilename = None
+is_mask = False
 opts, args = getopt.getopt \
   (
     sys.argv[1:],
     "",
     [
-        "cell=", "margin=", "min-wire=", "pattern=", "seed=",
+        "cell=", "margin=", "mask", "min-wire=", "pattern=", "seed=",
         "straight=", "tile", "tile-x", "tile-y", "wire="
     ]
   )
@@ -338,6 +350,9 @@ for keyword, value in opts :
         min_wire_length = pos_int(value)
     elif keyword == "--margin" :
         margin = vector_str(value, float)
+    elif keyword == "--mask" :
+        is_mask = True
+        colours = colours_mask
     elif keyword == "--pattern" :
         pattern_size = vector_str(value, pos_int)
     elif keyword == "--seed" :
@@ -388,7 +403,7 @@ while len(positions_avail) != 0 :
 
 pix = qah.ImageSurface.create \
   (
-    format = CAIRO.FORMAT_RGB24,
+    format = (CAIRO.FORMAT_RGB24, CAIRO.FORMAT_ARGB32)[is_mask],
     dimensions = round((pattern_size * cell_size + 2 * margin) * dpi / qah.base_dpi)
   )
 ctx = \
@@ -398,6 +413,7 @@ ctx = \
         .translate(margin)
     )
 ctx.source_colour = colours["background"]
+ctx.operator = CAIRO.OPERATOR_SOURCE # needed for mask
 ctx.paint()
 for wire in wires :
     if len(wire) >= min_wire_length :
